@@ -57,6 +57,29 @@
         </v-btn>
       </v-form>
     </v-card>
+
+    <v-dialog
+      v-model="dialog"
+      persistent
+      max-width="290"
+    >
+    <v-card>
+        <v-card-title class="text-h5 mb-2">
+          Login Gagal!
+        </v-card-title>
+        <v-card-text class="mb-2 red--text"><i>Email atau password salah! <br> Silahkan login lagi. </i></v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="bg-gradient-secondary"
+            class="white--text"
+            @click="dialog = false"
+          >
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     </div>
 </template>
 <script>
@@ -74,6 +97,7 @@ export default {
         show1: false,
         checkbox: false,
         valid: false,
+        dialog: false,
         emailRules: [
           v => !!v || 'Email is required',     
           // v => (v && v.length <= 10) || 'Username must be less than 10 characters',
@@ -111,6 +135,7 @@ export default {
                   },
                   error => {
                     this.loading = false;
+                    this.dialog = true
                     this.message =
                       (error.response && error.response.data && error.response.data.message) ||
                       error.message ||
