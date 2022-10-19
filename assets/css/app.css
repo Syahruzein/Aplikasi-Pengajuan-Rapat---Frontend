@@ -1,0 +1,114 @@
+    @import 'aos/dist/aos.css';
+
+    body {
+        /* min-height: 500vh; */
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* font*/
+    .fs-1 {
+        font-size:calc(1.375rem + 1.5vw)!important
+    }
+    .fs-2 {
+        font-size:calc(1.325rem + .9vw)!important
+    }
+    .fs-3 { 
+        font-size:calc(1.3rem + .6vw)!important
+    }
+    .fs-4 { 
+        font-size:calc(1.275rem + .3vw)!important
+    }
+    .fs-5 { 
+        font-size:1.25rem!important
+    }
+    .fs-6 { 
+        font-size:1rem!important
+    }
+    
+    .fw-light{font-weight:300!important}.fw-lighter{font-weight:lighter!important}.fw-normal{font-weight:400!important}.fw-bold{font-weight:700!important}.fw-bolder{font-weight:bolder!important}
+    
+    .text-yellow{
+        color: yellow;
+        text-shadow: 1px 1px 2px #333;
+    }
+
+
+    /* NavBar */
+
+    .navbary {
+        transition: all 0.2s ease-in-out;
+        background: transparent;
+        font-weight: 600;
+    }
+    .navbary.onScroll {
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 0 10px #aaa;
+        background-color: white;
+    }
+
+    .navbar-brandy {
+        transition: all 0.2s ease-in-out;
+        color:white;
+        text-shadow: 2px 2px 2px #000000;
+        text-decoration: none;
+    }
+    .navbar-brandy:hover {
+        transition: all 0.2s ease-in-out;
+        color:white;
+    }
+    .navbar-brandy.onScroll {
+        transition: all 0.2s ease-in-out;
+        color:black;
+        text-shadow: none;
+    }
+  
+
+    .nav-linky {
+        transition: all 0.2s ease-in-out;
+        color:white;
+        text-shadow: 2px 2px 2px #000000;
+        text-decoration: none;
+    }
+    .nav-linky:hover, .nav-linky:focus {
+        transition: all 0.2s ease-in-out;
+        color:yellow;
+    }
+    .nav-linky.onScroll {
+        transition: all 0.2s ease-in-out;
+        color:black;
+        text-shadow: none;
+    }
+    .nav-linky.onScroll:hover, .nav-linky.onScroll:focus {
+        transition: all 0.2s ease-in-out;
+        color: #0d6efd;
+    }
+
+    i.fas-color{
+        transition: all 0.2s ease-in-out;
+        color: white;
+    }
+    i.fas-color.onScroll{
+        transition: all 0.2s ease-in-out;
+        color: black;
+    }
+
+    /* MiddleView */
+
+    #bodyMdView {
+        height: 205vh;
+        background-color: white;
+    }
+    .fs-6 {
+        padding-top: 0.5rem;
+    }
+
+    
+    /* FooterView  */
+    #bodyFtView{
+        height: 20vh;
+        background-color: rgba(49, 49, 49, 1);
+    }
+    .logo{
+        padding-right: 0.5rem;
+        padding-left: 3rem;
+    }
