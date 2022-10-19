@@ -257,15 +257,15 @@ export default {
     },
     methods: {
         async countMeet() {
-            const receiver = this.$store.state.authentication.position;
-            const participants = this.$store.state.authentication.username;
+            const receiver = this.$store.state.authentication.user.position;
+            const participants = this.$store.state.authentication.user.username;
             const getCount = await this.$axios(`http://localhost:8080/meet/count-meet-finish-receiver/${receiver}/${participants}`);
             this.totalMeet = getCount.data.total;
             // console.log("data", getData);
         },
         async getMeet() {
-            const receiver = this.$store.state.authentication.position;
-            const participants = this.$store.state.authentication.username;
+            const receiver = this.$store.state.authentication.user.position;
+            const participants = this.$store.state.authentication.user.username;
             const getData = await this.$axios(`http://localhost:8080/meet/finish-receiver-invite/${receiver}/${participants}`);
             // // if(getData.data.id == userId) {
                 this.meet = getData.data;
