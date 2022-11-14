@@ -2,15 +2,15 @@
     <div>
         <h2 class="mt-2">Pengajuan Rapat</h2>
 
-        <form-vue></form-vue>
+        <form-kadep></form-kadep>
     </div>
 </template>
 <script>
-    import FormVue from './components/pengajuan/Form.vue';
+    import FormKadep from './components/pengajuan/Form.vue';
 export default {
     name: "Beranda",
     components: {
-        FormVue
+        FormKadep
     },
     computed: {
         currentUser(){

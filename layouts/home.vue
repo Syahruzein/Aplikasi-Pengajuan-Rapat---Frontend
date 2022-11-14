@@ -2,7 +2,6 @@
     <div>
         <NavBar />
         <TopView />
-        <Modal />
         <MiddleView :key="$route.fullPath"/>
         <FooterView />
     </div>
@@ -11,12 +10,6 @@
 <style >
     @import "https://pro.fontawesome.com/releases/v5.10.0/css/all.css";
     @import '~/assets/css/app.css';
-     .modal-open {
-      padding-right: 0 !important;
-    }
-    html {
-        overflow-y: scroll !important;
-    }
 </style>
 
 <script>
@@ -24,7 +17,6 @@ import FooterView from './home/FooterView.vue'
 import MiddleView from './home/MiddleView.vue'
 import NavBar from './home/NavBar.vue'
 import TopView from './home/TopView.vue'
-import Modal from './home/Modal.vue'
 
 // import aos from '~/plugins/aos'
 // import AOS from 'aos'
@@ -38,7 +30,6 @@ export default {
         TopView,
         MiddleView,
         FooterView,
-        Modal
         // Home,
     },
     head () {

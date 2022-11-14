@@ -66,9 +66,9 @@
                                         >
                                             <v-subheader class="pt-4 mb-2">
                                                 <p>
-                                                    <b class="subheader">{{ selectedItemIndex.maker }} </b> 
+                                                    Dari : <b class="subheader">{{ selectedItemIndex.maker }} </b> 
                                                     <br> 
-                                                    kepada saya
+                                                    Kepada : {{ selectedItemIndex.receiver }}
                                                 </p>
                                             </v-subheader>
                                             <v-list-item>
@@ -453,7 +453,7 @@
                 menu2: false,
                 alasan: "",
                 headers: [
-                    // { text: "ID", value: "id" },
+                    { text: "Dari", value: "maker" },
                     { text: "Perihal", value: "perihal" },
                     { text: "Tempat", value: "tempat" },
                     { text: "Tanggal", value: "tanggal" },
@@ -490,11 +490,7 @@
                 checkboxRules : [
                     $v => !!$v || 'You must agree to continue!'
                 ],
-                // verified: [
-                //     {
-                //         "username": "oke",
-                //     }
-                // ],
+                nameVerified : [{"username": ""}],
                 defaultItem : {
                     perihal: '',
                     tempat: '',
@@ -522,19 +518,17 @@
                 const receiver = this.$store.state.authentication.user.position;
                 const getData = await this.$axios(`http://localhost:8080/meet/process-receiver/${receiver}`);
                 this.meet = getData.data;
-                console.log(this.meet)
             },
             async getParticipants(){
                 // const username  = this.$store.state.authentication.user.username;
                 const getData = await this.$axios(`http://localhost:8080/api/auth/user`);
                 this.people = getData.data;
             },
-            // async getNameVerified(){
-            //     const position = this.selectedItemIndex.receiver;
-            //     const getData = await this.$axios(`http://localhost:8080/api/auth/user-by-position/${position}`);
-            //     // console.log(getData);
-            //     this.verified = getData.data;
-            // },
+            async getAuthNameVerified() {
+                const position = this.selectedItemIndex.receiver;
+                const getData = await this.$axios(`http://localhost:8080/api/auth/user-by-position/${position}`)
+                this.nameVerified = getData.data;
+            },
             // async getPengajuan() {
             //     // const userId = this.$store.state.authentication.user.id;
             //     const getData = await this.$axios(`http://localhost:8080/meet/process-all`);
@@ -558,8 +552,7 @@
             editItem(item) {
                 this.editedIndex = this.meet.indexOf(item);
                 this.selectedItemIndex = Object.assign({}, item);
-                // this.getNameVerified(this.editedIndex);
-                // this.editedIndex = -1
+                this.getAuthNameVerified(this.editedIndex);
                 this.dialog = true;
             },
             deleteItem(item) {

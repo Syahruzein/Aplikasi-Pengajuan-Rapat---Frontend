@@ -66,9 +66,9 @@
                                         >
                                             <v-subheader class="pt-4 mb-2">
                                                 <p>
-                                                    <b class="subheader">{{ selectedItemIndex.maker }} </b> 
+                                                    Dari : <b class="subheader">{{ selectedItemIndex.maker }} </b> 
                                                     <br> 
-                                                    kepada saya
+                                                    Kepada : {{ selectedItemIndex.receiver }}
                                                 </p>
                                             </v-subheader>
                                             <v-list-item>
@@ -453,7 +453,7 @@
                 menu2: false,
                 alasan: "",
                 headers: [
-                    // { text: "ID", value: "id" },
+                    { text: "Dari", value: "maker" },
                     { text: "Perihal", value: "perihal" },
                     { text: "Tempat", value: "tempat" },
                     { text: "Tanggal", value: "tanggal" },

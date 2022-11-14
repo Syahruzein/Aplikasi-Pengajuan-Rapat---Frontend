@@ -130,6 +130,7 @@
                     item-value="position"
                     outlined
                     required
+                    @change="except"
                     >
                         <template v-slot:selection="data">
                             {{ data.item.position }}
@@ -153,17 +154,29 @@
                         item-text="username"
                         item-value="username"
                         multiple
+                        clearable
+                        deletable-chips
+                        single-line
+                        required
                         >
-                        <template v-slot:selection="data">
-                            <v-chip
-                            v-bind="data.attrs"
-                            :input-value="data.selected"
-                            close
-                            @click="data.select"
-                            @click:close="remove(data.item)"
+                        <template v-slot:prepend-item>
+                            <v-list-item
+                            ripple
+                            @mousedown.prevent
+                            @click="toggle"
                             >
-                                {{ data.item.username }}
-                            </v-chip>
+                                <v-list-item-action>
+                                   <v-icon :color="participants.length > 0 ? 'indigo darken-4' : ''">
+                                        {{ icon }}
+                                   </v-icon> 
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        Select All
+                                    </v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-divider class="mt-2"></v-divider>
                         </template>
                     </v-autocomplete>
                     </v-row>
@@ -263,15 +276,14 @@
                 waktu: '',
                 status: '1',
                 receiver: '',
-                participants: '',
+                participants: [],
                 deskripsi: '',
-
                 executive: [
                     {
                         "position": "",
                     }
                 ],
-
+                selectedItemIndex: -1,
                 people: [
                     // { header: 'Tambah peserta rapat' },
                     { 
@@ -280,6 +292,8 @@
                         "username": "Sandra Adams" 
                     },
                 ],
+
+                people2: [{}],
             
             isOperationsSuccess: false,
             valid: false,
@@ -302,6 +316,10 @@
             receiverRules : [
                 v => !!v || 'Penerima is required',
             ],
+            participantsRules : [
+                v => !!v || 'Peserta is required',
+                v => (v && v.length > 0 ) || 'Peserta required'
+            ],
             deskripsiRules : [
                 v => !!v || 'Deskripsi is required',
                 v => (v && v.length <= 250) || 'Deskripsi must be less than 250 characters',
@@ -320,6 +338,17 @@
             // }),
             success(){
                 return  this.isOperationsSuccess
+            },
+            likeAllParticipants () {
+                return this.participants.length === this.people.length
+            },
+            likeSomeParticipants () {
+                return this.participants.length > 0 && !this.likeAllParticipants
+            },
+            icon () {
+                if (this.likeAllParticipants) return 'mdi-close-box'
+                if (this.likeSomeParticipants) return 'mdi-minus-box'
+                return 'mdi-checkbox-blank-outline'
             }
         },        
         methods: {
@@ -359,13 +388,25 @@
             },
             async getParticipants (){
                 const username  = this.$store.state.authentication.user.username;
+                // const position = this.receiver;
+                // console.log(username);
+                // console.log(position);
                 const getData = await this.$axios(`http://localhost:8080/api/auth/user-invite/${username}`);
                 this.people = getData.data;
+                this.people2 = getData.data;
             },
             async getReceiver () {
                 const getData = await this.$axios(`http://localhost:8080/api/auth/director`);
                 this.executive = getData.data;
             },  
+            except() {
+                const exception = this.people2.map(item => {
+                    if(item.position != this.receiver){
+                        return item;
+                    }
+                })
+                this.people = exception
+            },
             clear () {
                 this.$refs.form.reset()
             },
@@ -376,6 +417,15 @@
             closeDialog () {
                 this.$refs.form.reset()
                 this.dialog = false
+            },
+            toggle () {
+                this.$nextTick(() => {
+                    if (this.likeAllParticipants) {
+                        this.participants = []
+                    } else {
+                        this.participants = this.people.slice()
+                    }
+                })
             }
         },
         mounted() {

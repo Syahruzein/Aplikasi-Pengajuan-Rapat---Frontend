@@ -63,9 +63,9 @@
                                         >
                                             <v-subheader class="pt-4 mb-2">
                                                 <p>
-                                                    <b class="subheader">Saya </b> 
+                                                    Dari : <b class="subheader">{{ selectedItemIndex.maker }} </b> 
                                                     <br> 
-                                                    kepada {{ selectedItemIndex.receiver }}
+                                                    Kepada : {{ selectedItemIndex.receiver }}
                                                 </p>
                                             </v-subheader>
                                             <v-list-item>

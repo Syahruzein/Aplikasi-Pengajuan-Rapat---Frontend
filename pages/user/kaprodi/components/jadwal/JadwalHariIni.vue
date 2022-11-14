@@ -41,9 +41,9 @@
                                         >
                                             <v-subheader class="pt-4 mb-2">
                                                 <p>
-                                                    <b class="subheader">{{ selectedItemIndex.maker }} </b> 
+                                                    Dari : <b class="subheader">{{ selectedItemIndex.maker }} </b> 
                                                     <br> 
-                                                    kepada Saya
+                                                    Kepada : Saya
                                                 </p>
                                             </v-subheader>
                                             <v-list-item class="mt-2">
@@ -170,7 +170,7 @@ export default {
             const year = today.getFullYear();
             const mes = today.getMonth()+1;
             const dia = today.getDate();
-            const tanggal =dia+"-"+mes+"-"+year;
+            const tanggal =year+"-"+mes+"-"+dia;
             const user_id = this.$store.state.authentication.user.id;
             const getData = await this.$axios(`http://localhost:8080/meet/success-date-id/${tanggal}/${user_id}`);
             // // if(getData.data.id == userId) {

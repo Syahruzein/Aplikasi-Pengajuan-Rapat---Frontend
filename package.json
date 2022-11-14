@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
-    "generate": "nuxt generate",
     "postinstall": "npm run build",
-    "start": "node server.js"
+    "start": "node server.js",
+    "generate": "nuxt generate"
   },
   "dependencies": {
     "@nuxt/builder": "^2.15.8",

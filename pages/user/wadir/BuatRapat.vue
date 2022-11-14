@@ -135,17 +135,29 @@
                         item-text="username"
                         item-value="username"
                         multiple
+                        clearable
+                        deletable-chips
+                        single-line
+                        required
                         >
-                        <template v-slot:selection="data">
-                            <v-chip
-                            v-bind="data.attrs"
-                            :input-value="data.selected"
-                            close
-                            @click="data.select"
-                            @click:close="remove(data.item)"
+                        <template v-slot:prepend-item>
+                            <v-list-item
+                            ripple
+                            @mousedown.prevent
+                            @click="toggle"
                             >
-                                {{ data.item.username }}
-                            </v-chip>
+                                <v-list-item-action>
+                                    <v-icon :color="participants.length > 0 ? 'indigo darken-4' : ''">
+                                        {{ icon }}
+                                    </v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        Select All
+                                    </v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-divider class="mt-2"></v-divider>
                         </template>
                     </v-autocomplete>
 
@@ -245,7 +257,7 @@
                 tanggal: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
                 waktu: '',
                 status: '2',
-                participants: '',
+                participants: [],
                 deskripsi: '',
                 // user_id: '',
                 people: [
@@ -277,6 +289,7 @@
             ],
             participantsRules: [
                 v => !!v || 'Peserta is required',
+                v => (v && v.length > 0) || 'Peserta is required'
             ],
             deskripsiRules : [
                 v => !!v || 'Deskripsi is required',
@@ -288,14 +301,25 @@
             ]
         }),
         computed: {
-            currentUser(){
+            currentUser () {
                 return this.$store.state.authentication.user;
             },
             computedDateFormattedMomentjs () {
                 return this.tanggal ? moment.utc(this.tanggal).format('dddd, MMMM Do YYYY') : ''
             },
-            success(){
+            success () {
                 return  this.isOperationsSuccess
+            },
+            likeAllParticipants () {
+                return this.participants.length === this.people.length
+            },
+            likeSomeParticipants () {
+                return this.participants.length > 0 && !this.likeAllParticipants
+            },
+            icon () {
+                if (this.likeAllParticipants) return 'mdi-close-box'  
+                if (this.likeSomeParticipants) return 'mdi-minus-box'
+                return 'mdi-checkbox-blank-outline'
             }
         },
         methods: {
@@ -347,6 +371,15 @@
                 const index = this.participants.indexOf(item.username)
                 if (index >= 0) this.participants.splice(index, 1)
             },
+            toggle () {
+                this.$nextTick(() => {
+                    if (this.likeAllParticipants) {
+                        this.participants = []
+                    } else {
+                        this.participants = this.people.slice()
+                    }
+                })
+            }
         },
         mounted() {
             this.getParticipants();

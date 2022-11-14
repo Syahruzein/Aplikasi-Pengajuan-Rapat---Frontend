@@ -49,7 +49,7 @@
                         outlined
                         rounded
                         small
-                        to="/user/director/Jadwal"
+                        to="/user/staff/Jadwal"
                       >
                         LIHAT
                       </v-btn>
@@ -60,7 +60,7 @@
                         outlined
                         rounded
                         small
-                        to="/user/director/Notulen"
+                        to="/user/staff/Notulen"
                       >
                         DETAIL
                       </v-btn>
@@ -71,7 +71,7 @@
                         outlined
                         rounded
                         small
-                        to="/user/director/DataPengajuan"
+                        to="/user/staff/DataPengajuan"
                       >
                         CEK
                       </v-btn>

@@ -61,13 +61,13 @@
                 required
               ></v-checkbox>
       
-              <p class="ml-1 mb-5 text-subtitle-1" >
+              <!-- <p class="ml-1 mb-5 text-subtitle-1" >
               Sudah punya akun?
                 <a
                   href="./login"    
                   style="text-decoration: none;"
                 >Masuk</a>
-              </p>  
+              </p>   -->
       
               <v-btn
                 class="mr-4 white--text"
