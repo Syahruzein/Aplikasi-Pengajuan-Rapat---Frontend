@@ -1,6 +1,7 @@
 <template>
     <div>
       <v-card
+      v-if="showDirector"
       class=" pa-1 mt-4"
       outlined
       tile
@@ -92,7 +93,9 @@
         </v-row>
       </v-card>
 
-      <v-row>
+      <v-row
+      v-if="showDirector"
+      >
         <v-col>
           <h2 class="mt-4">Profile</h2>
 
@@ -161,7 +164,17 @@
           <JadwalInviteHariIni/>
         </v-col>
       </v-row>
-
+      <v-card v-if="!showDirector" class="pa-6 mt-4" outlined tile>
+        <v-card elevation="3" class="pa-8">
+            <v-alert
+            type="error"
+            prominent
+            border="left"
+            >          
+            <h2>Required role director !!!.</h2>
+            </v-alert>
+        </v-card>
+    </v-card>
     </div>
 </template>
 <script>
@@ -201,6 +214,13 @@ export default {
     computed: {
       currentUser() {
         return this.$store.state.authentication.user;
+      },
+      showDirector() {
+        if (this.currentUser && this.currentUser.roles) {
+            return this.currentUser.roles.includes('ROLE_DIRECTOR');
+        }
+
+        return false;
       },
     },
     methods: {

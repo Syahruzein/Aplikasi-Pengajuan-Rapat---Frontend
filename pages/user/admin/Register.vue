@@ -1,129 +1,144 @@
 <template>
   <div>
-    <h2 class="mt-2">Tambah Pengguna</h2>
-    <v-container>
-      <v-row>
-        <v-spacer></v-spacer>
-        <v-col>
-          <v-card
-            elevation="2"
-            outlined
-            shaped
-            class="mt-5 pa-13"
-            width="50rem"
-          >
-            <v-form 
-              ref="form" 
-              v-model="valid" 
-              lazy-validation
+    <div v-if="showAdmin">
+      <h2 class="mt-2">Tambah Pengguna</h2>
+      <v-container>
+        <v-row>
+          <v-spacer></v-spacer>
+          <v-col>
+            <v-card
+              elevation="2"
+              outlined
+              shaped
+              class="mt-5 pa-13"
+              width="50rem"
             >
-              <v-text-field
-                v-model="username"
-                :rules="usernameRules"
-                :counter="60"
-                label="Name"
-                required
-              ></v-text-field>
-              <v-text-field
-                v-model="email"
-                :rules="emailRules"
-                label="E-mail"
-                required
-              ></v-text-field>
-              <v-text-field 
-                v-model="password" 
-                :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" 
-                :type="show1 ? 'text' : 'password'" 
-                :rules="passwordRules"
-                name="input-10-1" 
-                label="Password" 
-                hint="At least 8 characters" 
-                counter @click:append="show1 = !show1"
-              ></v-text-field>
-              <v-autocomplete
-                v-model="position"
-                :rules="positionRules"
-                :items="itemPosition"
-                label="Jabatan"
-                required
-              ></v-autocomplete>
-              <v-autocomplete
-                v-model="roles"
-                :rules="rolesRules"
-                :items="items"
-                label="Roles"
-                required
-              ></v-autocomplete>        
-              <v-checkbox
-                v-model="checkbox"
-                :rules="checkboxRules"
-                label="Do you agree?"
-                required
-              ></v-checkbox>
-      
-              <!-- <p class="ml-1 mb-5 text-subtitle-1" >
-              Sudah punya akun?
-                <a
-                  href="./login"    
-                  style="text-decoration: none;"
-                >Masuk</a>
-              </p>   -->
-      
-              <v-btn
-                class="mr-4 white--text"
-                color="bg-gradient-info"
-                :disabled="!valid"
-                @click="validate"
+              <v-form 
+                ref="form" 
+                v-model="valid" 
+                lazy-validation
               >
-                submit
-              </v-btn>
-              <v-btn @click="clear" color="bg-gradient-secondary" class="white--text">
-                clear
-              </v-btn>
-            </v-form>
-          </v-card>
-      
-          <v-dialog
-            v-model="dialog"
-            max-width="50rem"
-            transition="dialog-bottom-transition"
-            persistent
-            >
-                <v-card>
-                    <v-toolbar
-                    color="primary"
-                    dark
-                    >
-                    <h2 v-if="success">Berhasil mendaftar</h2>
-                    <h2 v-if="!success">Gagal mendaftar</h2>
-                    </v-toolbar>
-                    <v-card-text>
-                    <div class="text pa-12">
-                        <h2 v-if="success">Ok untuk lanjut, klik dibawah ini :</h2>
-                        <h2 v-if="!success">Anda bisa mencoba mendaftar lagi, klik dibawah ini :</h2>
-                        </div>
-                    </v-card-text>
-                    <v-card-actions v-if="!success" class="justify-end">
-                    <v-btn
-                        class="white--text"
-                        color="bg-gradient-info"
-                        @click="dialog = !dialog"
-                    >Close</v-btn>
-                    </v-card-actions>
-                    <v-card-actions v-if="success" class="justify-end">
-                    <v-btn
-                        class="white--text"
-                        color="bg-gradient-info"
-                        @click.stop="cleared"
-                        >Ok</v-btn>
-                        <!-- :to="`./login`" -->
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-        </v-col>
-        <v-spacer></v-spacer>
-      </v-row>
-    </v-container>
+                <v-text-field
+                  v-model="username"
+                  :rules="usernameRules"
+                  :counter="60"
+                  label="Name"
+                  required
+                ></v-text-field>
+                <v-text-field
+                  v-model="email"
+                  :rules="emailRules"
+                  label="E-mail"
+                  required
+                ></v-text-field>
+                <v-text-field 
+                  v-model="password" 
+                  :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" 
+                  :type="show1 ? 'text' : 'password'" 
+                  :rules="passwordRules"
+                  name="input-10-1" 
+                  label="Password" 
+                  hint="At least 8 characters" 
+                  counter @click:append="show1 = !show1"
+                ></v-text-field>
+                <v-autocomplete
+                  v-model="position"
+                  :rules="positionRules"
+                  :items="itemPosition"
+                  label="Jabatan"
+                  required
+                ></v-autocomplete>
+                <v-autocomplete
+                  v-model="roles"
+                  :rules="rolesRules"
+                  :items="items"
+                  label="Roles"
+                  required
+                ></v-autocomplete>        
+                <v-checkbox
+                  v-model="checkbox"
+                  :rules="checkboxRules"
+                  label="Do you agree?"
+                  required
+                ></v-checkbox>
+        
+                <!-- <p class="ml-1 mb-5 text-subtitle-1" >
+                Sudah punya akun?
+                  <a
+                    href="./login"    
+                    style="text-decoration: none;"
+                  >Masuk</a>
+                </p>   -->
+        
+                <v-btn
+                  class="mr-4 white--text"
+                  color="bg-gradient-info"
+                  :disabled="!valid"
+                  @click="validate"
+                >
+                  submit
+                </v-btn>
+                <v-btn @click="clear" color="bg-gradient-secondary" class="white--text">
+                  clear
+                </v-btn>
+              </v-form>
+            </v-card>
+        
+            <v-dialog
+              v-model="dialog"
+              max-width="50rem"
+              transition="dialog-bottom-transition"
+              persistent
+              >
+                  <v-card>
+                      <v-toolbar
+                      color="primary"
+                      dark
+                      >
+                      <h2 v-if="success">Berhasil mendaftar</h2>
+                      <h2 v-if="!success">Gagal mendaftar</h2>
+                      </v-toolbar>
+                      <v-card-text>
+                      <div class="text pa-12">
+                          <h2 v-if="success">Ok untuk lanjut, klik dibawah ini :</h2>
+                          <h2 v-if="!success">Anda bisa mencoba mendaftar lagi, klik dibawah ini :</h2>
+                          </div>
+                      </v-card-text>
+                      <v-card-actions v-if="!success" class="justify-end">
+                      <v-btn
+                          class="white--text"
+                          color="bg-gradient-info"
+                          @click="dialog = !dialog"
+                      >Close</v-btn>
+                      </v-card-actions>
+                      <v-card-actions v-if="success" class="justify-end">
+                      <v-btn
+                          class="white--text"
+                          color="bg-gradient-info"
+                          @click.stop="cleared"
+                          >Ok</v-btn>
+                          <!-- :to="`./login`" -->
+                      </v-card-actions>
+                  </v-card>
+              </v-dialog>
+          </v-col>
+          <v-spacer></v-spacer>
+        </v-row>
+      </v-container>
+    </div>
+    <div v-if="!showAdmin">
+      <v-card class="pa-6 mt-4" outlined tile>
+        <v-card elevation="3" class="pa-8">
+            <v-alert
+            type="error"
+            prominent
+            border="left"
+            >          
+            <h2>Required role admin !!!.</h2>
+            </v-alert>
+        </v-card>
+      </v-card>
+    </div>
   </div>
 </template>
     <script>
@@ -203,6 +218,21 @@
         computed: {
             success(){
                 return  this.isOperationsSuccess
+            },
+            currentUser() {
+                return this.$store.state.authentication.user;
+            },
+            showAdmin() {
+              if (this.currentUser && this.currentUser.roles) {
+                return this.currentUser.roles.includes('ROLE_ADMIN');
+              }
+
+              return false;
+            },
+        },
+        mounted() {
+            if (!this.currentUser) {
+                this.$router.push('/');
             }
         },
         methods: {

@@ -1,6 +1,7 @@
-<template lang="">
+<template>
     <div>
         <v-card
+        v-if="showWadir"
         class=" pa-6 mt-4"
         outlined
         tile
@@ -56,6 +57,7 @@
                                     <v-date-picker
                                         v-model="tanggal"
                                         scrollable
+                                        @change="triple"
                                     >
                                         <v-spacer></v-spacer>
                                         <v-btn
@@ -68,7 +70,7 @@
                                         <v-btn
                                             text
                                             color="primary"
-                                            @click="$refs.dialog1.save(tanggal)"
+                                            @click="$refs.dialog1.save(tanggal); alerts = true;"
                                         >
                                             OK
                                         </v-btn>
@@ -103,6 +105,7 @@
                                     v-if="modal2"
                                     v-model="waktu"
                                     full-width
+                                    @change="timedi"
                                 >
                                     <v-spacer></v-spacer>
                                     <v-btn
@@ -123,6 +126,103 @@
                             </v-dialog>
                         </v-col>
                     </v-row>
+
+                    <v-alert
+                    :value="alerts"
+                    outlined
+                    color="cyan"
+                    border="left"
+                    type="info"
+                    transition="scale-transition"
+                    >
+                        <v-row>
+
+                        <v-col
+                        v-if="(fixDateCheck.length === 0)"
+                        >
+                            <p class="black--text">
+                            Belum ada yang mengajukan hari yang dipilih. Anda bisa mengajukan rapat!!.
+                            </p>
+                            <v-data-table
+                            :headers="headers"
+                            :items="fixDateCheck"
+                            sort-by="waktu"
+                            class="elevation-1"
+                            >
+                            <template v-slot:[getItemTanggal()]="{ item }">
+                                <span>{{ new Date(item.tanggal).toLocaleDateString('da') }}</span>
+                                <!-- da-DK -->
+                            </template>
+                            </v-data-table>
+                            <p class="red--text pt-6">
+                            <i>
+                                Catatans : Rapat maksimal dalam 1 hari adalah 3 kali dan Jika ada waktu yang sudah dipesan. Anda tidak akan bisa memilih waktu dengan jangkauan 2 jam sebelumnya dan 2 jam setelahnya !!!. Terima kasih.
+                            </i>
+                            </p>
+                        </v-col>
+
+                        <v-col
+                        v-if="(fixDateCheck.length >= 3)"
+                        >
+                            <p class="red--text">
+                            Hari yang dipilih sudah penuh. Mohon ma'af, tidak bisa mengajukan rapat!!.
+                            <br>Berikut detail rapat yang sudah ada :
+                            </p>
+                            <v-data-table
+                            :headers="headers"
+                            :items="fixDateCheck"
+                            sort-by="waktu"
+                            class="elevation-1"
+                            >
+                            <template v-slot:[getItemTanggal()]="{ item }">
+                                <span>{{ new Date(item.tanggal).toLocaleDateString('da') }}</span>
+                                <!-- da-DK -->
+                            </template>
+                            </v-data-table>
+                            <p class="red--text pt-6">
+                            <i>
+                                Catatans : Rapat maksimal dalam 1 hari adalah 3 kali dan Jika ada waktu yang sudah dipesan. Anda tidak akan bisa memilih waktu dengan jangkauan 2 jam sebelumnya dan 2 jam setelahnya !!!. Terima kasih.
+                            </i>
+                            </p>
+                        </v-col>
+                        
+                        <v-col
+                        v-if="(fixDateCheck.length >= 1 && fixDateCheck.length < 3)"
+                        >
+                            <p class="black--text">
+                            Masih bisa mengajukan hari yang dipilih. Anda bisa mengajukan rapat!!.
+                            <br>Berikut detail rapat yang sudah ada :
+                            </p>
+                            <v-data-table
+                            :headers="headers"
+                            :items="fixDateCheck"
+                            sort-by="waktu"
+                            class="elevation-1"
+                            >
+                            <template v-slot:[getItemTanggal()]="{ item }">
+                                <span>{{ new Date(item.tanggal).toLocaleDateString('da') }}</span>
+                                <!-- da-DK -->
+                            </template>
+                            </v-data-table>
+                            
+                            <p class="red--text pt-6">
+                            <i>
+                                Catatans : Rapat maksimal dalam 1 hari adalah 3 kali dan Jika ada waktu yang sudah dipesan. Anda tidak akan bisa memilih waktu dengan jangkauan 2 jam sebelumnya dan 2 jam setelahnya !!!. Terima kasih.
+                            </i>
+                            </p>
+                        </v-col>
+
+                        <v-divider vertical></v-divider>
+                        <v-btn
+                        color="red"
+                        icon
+                        dark
+                        @click="alerts = false"
+                        >
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                        </v-row>
+                    </v-alert>
                     
                     <v-autocomplete
                         v-model="participants"
@@ -136,28 +236,33 @@
                         item-value="username"
                         multiple
                         clearable
-                        deletable-chips
                         single-line
                         required
                         >
                         <template v-slot:prepend-item>
-                            <v-list-item
-                            ripple
-                            @mousedown.prevent
-                            @click="toggle"
-                            >
-                                <v-list-item-action>
-                                    <v-icon :color="participants.length > 0 ? 'indigo darken-4' : ''">
-                                        {{ icon }}
-                                    </v-icon>
-                                </v-list-item-action>
-                                <v-list-item-content>
-                                    <v-list-item-title>
-                                        Select All
-                                    </v-list-item-title>
-                                </v-list-item-content>
+                            <v-list-item ripple @mousedown.prevent @click="toggle">
+                              <v-list-item-action>
+                                <v-icon
+                                  :color="participants.length > 0 ? 'indigo darken-4' : ''"
+                                >
+                                  {{ icon }}
+                                </v-icon>
+                              </v-list-item-action>
+                              <v-list-item-content>
+                                <v-list-item-title> Select All </v-list-item-title>
+                              </v-list-item-content>
                             </v-list-item>
                             <v-divider class="mt-2"></v-divider>
+                          </template>
+                          <template v-slot:selection="data">
+                            <v-chip
+                            v-bind="data.attrs"
+                            :input-value="data.selected"
+                            color="yellow"
+                            @click="data.select"
+                            >
+                                {{ data.item.username }}
+                            </v-chip>
                         </template>
                     </v-autocomplete>
 
@@ -195,7 +300,19 @@
                             <v-card-text>
                             <div class="text pa-12">
                                 <h2 v-if="success">Anda bisa memeriksa di Data Rapat, klik dibawah ini :</h2>
-                                <h2 v-if="!success">Anda bisa mencoba membuat rapat lagi, klik dibawah ini :</h2>
+                                <h2 v-if="!success">
+                                    <v-alert
+                                    dense
+                                    outlined
+                                    type="error"
+                                    transition="scale-transition"
+                                    class="pb-6"
+                                    >
+                                      <h3><strong>Pemberitahuan !!!</strong></h3>
+                                      <br><i>Mohon ma'af. Pengajuan rapat sudah dipesan.</i> 
+                                    </v-alert>
+                                    <br><strong>Anda bisa mencoba membuat rapat lagi, klik dibawah ini :</strong>
+                                  </h2>
                                 </div>
                             </v-card-text>
                             <v-card-actions v-if="!success" class="justify-end">
@@ -209,13 +326,8 @@
                             <v-btn
                                 class="white--text"
                                 color="bg-gradient-info"
-                                @click="dialog = !dialog"
-                            >Close</v-btn>
-                            <v-btn
-                                class="white--text"
-                                color="bg-gradient-info"
-                                @click.stop="dialog = !dialog"
-                                :to="`/user/director/Jadwal`"
+                                @click="closeDialog"
+                                :to="`/user/wadir/Jadwal`"
                             >Lihat</v-btn>
                             </v-card-actions>
                         </v-card>
@@ -238,6 +350,17 @@
                 </v-form>
             </v-card>
         </v-card>
+        <v-card v-if="!showWadir" class="pa-6 mt-4" outlined tile>
+            <v-card elevation="3" class="pa-8">
+                <v-alert
+                type="error"
+                prominent
+                border="left"
+                >          
+                <h2>Required role wadir !!!.</h2>
+                </v-alert>
+            </v-card>
+        </v-card>
     </div>
 </template>
 <script>
@@ -249,6 +372,7 @@
             modal: false,
             modal2: false,
             dialog: false,
+            alerts: false,
             checkbox: false,
             enabled: false,
             editItem : {},
@@ -260,6 +384,13 @@
                 participants: [],
                 deskripsi: '',
                 // user_id: '',
+                headers: [
+                    // { text: "ID", value: "id" },
+                    { text: "Perihal", value: "perihal" },
+                    { text: "Tempat", value: "tempat" },
+                    { text: "Tanggal", value: "tanggal" },
+                    { text: "Waktu", value: "waktu" },
+                ],
                 people: [
                     // { header: 'Tambah peserta rapat' },
                     { 
@@ -268,6 +399,14 @@
                         "username": "Sandra Adams" 
                     },
                 ],
+
+                people2: [{}],
+      
+                dateCheck: [{}],
+
+                fixDateCheck: [{}],
+
+                fixTimeCheck: [{}],
             
             isOperationsSuccess: false,
             valid: false,
@@ -304,6 +443,13 @@
             currentUser () {
                 return this.$store.state.authentication.user;
             },
+            showWadir(){
+                if (this.currentUser && this.currentUser.roles) {
+                    return this.currentUser.roles.includes('ROLE_WADIR')
+                }
+
+                return false;
+            },
             computedDateFormattedMomentjs () {
                 return this.tanggal ? moment.utc(this.tanggal).format('dddd, MMMM Do YYYY') : ''
             },
@@ -328,6 +474,11 @@
                 if(this.$refs.form.validate()){
                     // const data = this.editItem;
                     // console.log(data);
+                    let finalParticipants = this.participants;
+                    if(this.isSelectAll){
+
+                    finalParticipants = finalParticipants.filter(item=> item != undefined).map((item) => item.username)
+                    }
                     const nameUser = this.$store.state.authentication.user.username;
                     const position = this.$store.state.authentication.user.position
                     await this.$axios({
@@ -335,13 +486,13 @@
                         method: 'post',
                         url: 'http://localhost:8080/meet/submission',
                         data: {
-                            perihal: this.perihal,
+                            perihal: 'Rapat ' + this.perihal,
                             tempat: this.tempat,
                             tanggal: this.tanggal,
                             waktu: this.waktu,
                             status: this.status,
                             receiver: position,
-                            participants: this.participants,
+                            participants: finalParticipants,
                             deskripsi: this.deskripsi,
                             user_id: JSON.stringify(this.$store.state.authentication.user.id),
                             maker: nameUser,
@@ -359,10 +510,21 @@
                     })
                 }
             },
+            async getMeet() {
+                const getData = await this.$axios(
+                    `http://localhost:8080/meet/process-and-success`
+                );
+                this.dateCheck = getData.data;
+            
+            },
             async getParticipants (){
                 const username  = this.$store.state.authentication.user.username;
                 const getData = await this.$axios(`http://localhost:8080/api/auth/user-invite/${username}`);
                 this.people = getData.data;
+                this.people2 = getData.data;
+            },
+            getItemTanggal() {
+                return "item.tanggal";
             },
             clear () {
                 this.$refs.form.reset()
@@ -371,24 +533,53 @@
                 const index = this.participants.indexOf(item.username)
                 if (index >= 0) this.participants.splice(index, 1)
             },
-            toggle () {
-                this.$nextTick(() => {
-                    if (this.likeAllParticipants) {
-                        this.participants = []
-                    } else {
-                        this.participants = this.people.slice()
+            triple() {
+            const triplying = this.dateCheck.filter((item) => {
+                return moment(item.tanggal).isSame(new Date(this.tanggal), "day")
+                })
+                if(triplying.length >= 3) {
+                    console.log("error")
+                } else {
+                    console.log('betul')
+                }
+                this.fixDateCheck = triplying;
+            },
+            timedi() {
+                const timede = this.dateCheck.filter((item) => {
+                return moment(item.tanggal).isSame(new Date(this.tanggal), "day")
+                }).filter((item)=> {
+                    var format = 'HH:mm'
+                    const time = moment(this.waktu, format);
+                    const beforeTime = moment(item.waktu, format).add(-2, 'hours');
+                    const afterTime = moment(item.waktu, format).add(2, 'hours');
+                    // console.log(time, beforeTime, afterTime)
+                    if(time.isBetween(beforeTime, afterTime)) {
+                        console.log('tidak boleh')
                     }
                 })
+                this.fixTimeCheck = timede;
+            },
+            closeDialog() {
+                this.$refs.form.reset();
+                this.dialog = false;
+                this.alerts = false;
+            },
+            toggle () {
+                this.$nextTick(() => {
+                    this.participants = this.people;
+                    this.isSelectAll = true;
+                });
             }
         },
         mounted() {
             this.getParticipants();
+            this.getMeet();
             if (!this.currentUser) {
-            this.$router.push('/');
+                this.$router.push('/');
             }
         },
     }
 </script>
-<style lang="">
+<style>
     
 </style>

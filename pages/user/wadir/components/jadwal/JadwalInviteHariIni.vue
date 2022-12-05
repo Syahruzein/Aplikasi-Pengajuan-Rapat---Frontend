@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-card
+            v-if="showWadir"
             class=" pa-6 mt-4"
             outlined
             tile
@@ -114,7 +115,18 @@
                             </div>
                      </template>
             </v-data-table>
+        </v-card>
+        <v-card v-if="!showWadir" class="pa-6 mt-4" outlined tile>
+            <v-card elevation="3" class="pa-8">
+                <v-alert
+                type="error"
+                prominent
+                border="left"
+                >          
+                <h2>Required role wadir !!!.</h2>
+                </v-alert>
             </v-card>
+        </v-card>
     </div>
 </template>
 <script>
@@ -212,6 +224,13 @@ export default {
     computed: {
         currentUser() {
             return this.$store.state.authentication.user;
+        },
+        showWadir(){
+            if (this.currentUser && this.currentUser.roles) {
+            return this.currentUser.roles.includes('ROLE_WADIR')
+            }
+
+            return false;
         },
         computedDateFormattedMomentjs () {
             return this.selectedItemIndex.tanggal ? moment(this.selectedItemIndex.tanggal).format('DD MMMM YYYY') : ''

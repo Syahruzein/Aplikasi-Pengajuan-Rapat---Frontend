@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-card
+        v-if="showStaff"
         class=" pa-6 mt-4"
         outlined
         tile
@@ -129,20 +130,20 @@
                                 color="primary"
                                 dark
                                 >
-                                <h2 v-if="success">Pengajuan rapat berhasil diupdate</h2>
-                                <h2 v-if="!success">Pengajuan rapat gagal diupdate</h2>
+                                <h2 v-if="success">Jadwal rapat selesai diselenggarakan</h2>
+                                <h2 v-if="!success">Jadwal rapat gagal menyelesaikan</h2>
                                 </v-toolbar>
                                 <v-card-text>
                                 <div class="text pa-12">
-                                    <h2 v-if="success">Anda bisa memeriksa di Data Pengajuan, klik dibawah ini :</h2>
-                                    <h2 v-if="!success">Anda bisa mencoba mengupdate lagi, klik dibawah ini :</h2>
+                                    <h2 v-if="success">Anda bisa memeriksa di Notulen rapat, klik dibawah ini :</h2>
+                                    <h2 v-if="!success">Anda bisa mencoba lagi, klik dibawah ini :</h2>
                                     </div>
                                 </v-card-text>
                                 <v-card-actions v-if="!success" class="justify-end">
                                 <v-btn
                                     class="white--text"
                                     color="bg-gradient-info"
-                                    @click.stop="dialogUPdate = !dialogUpdate"
+                                    @click="closeDialogUpdate"
                                 >Close</v-btn>
                                 </v-card-actions>
                                 <v-card-actions v-if="success" class="justify-end">
@@ -150,6 +151,7 @@
                                     class="white--text"
                                     color="bg-gradient-info"
                                     @click.stop="dialogUpdate = !dialogUpdate"
+                                    :to="`/user/staff/Notulen`"
                                 >Ok</v-btn>
                                 </v-card-actions>
                             </v-card>
@@ -184,6 +186,17 @@
                             </div>
                      </template>
                 </v-data-table> 
+            </v-card>
+        </v-card>
+        <v-card v-if="!showStaff" class="pa-6 mt-4" outlined tile>
+            <v-card elevation="3" class="pa-8">
+              <v-alert
+                type="error"
+                prominent
+                border="left"
+              >          
+                <h2>Required role staff !!!.</h2>
+              </v-alert>
             </v-card>
         </v-card>
     </div>
@@ -298,12 +311,16 @@
                 this.editedIndex = -1
                 })
             },
+            closeDialogUpdate() {
+                this.dialogUpdate = false
+            },
             save () {
+                const meet_id = this.selectedItemIndex.id;
                 if (this.editedIndex > -1) {
                         this.$axios({
                         method: 'put',
-                        url: 'http://localhost:8080/meet/update-success' ,
-                        data: Object.assign(this.meet[this.editedIndex], this.selectedItemIndex, this.selectedItemIndex.status = '3')
+                        url: 'http://localhost:8080/meet/update-finished' ,
+                        data: Object.assign(this.meet[this.editedIndex], this.selectedItemIndex, this.selectedItemIndex.status = '3', {meet_id})
                         })
                         .then(response => {
                             this.isOperationsSuccess = true
@@ -334,6 +351,13 @@
             },
             currentUser() {
                 return this.$store.state.authentication.user;
+            },
+            showStaff(){
+                if (this.currentUser && this.currentUser.roles) {
+                    return this.currentUser.roles.includes('ROLE_STAFF')
+                }
+
+                return false;
             },
             computedDateFormattedMomentjs () {
                 return this.selectedItemIndex.tanggal ? moment(this.selectedItemIndex.tanggal).format('dddd, MMMM Do YYYY') : ''

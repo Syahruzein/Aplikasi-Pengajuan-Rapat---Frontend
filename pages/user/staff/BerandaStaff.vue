@@ -1,6 +1,7 @@
 <template>
     <div>
       <v-card
+      v-if="showStaff"
       class=" pa-1 mt-4"
       outlined
       tile
@@ -92,7 +93,9 @@
         </v-row>
       </v-card>
 
-      <v-row>
+      <v-row
+      v-if="showStaff"
+      >
         <v-col>
           <h2 class="mt-4">Profile</h2>
 
@@ -158,7 +161,17 @@
           <staff-jadwal-invite-hari-ini></staff-jadwal-invite-hari-ini>
         </v-col>
       </v-row>
-
+      <v-card v-if="!showStaff" class="pa-6 mt-4" outlined tile>
+        <v-card elevation="3" class="pa-8">
+          <v-alert
+            type="error"
+            prominent
+            border="left"
+          >          
+            <h2>Required role staff !!!.</h2>
+          </v-alert>
+        </v-card>
+      </v-card>
     </div>
 </template>
 <script>
@@ -198,6 +211,13 @@ export default {
     computed: {
       currentUser() {
         return this.$store.state.authentication.user;
+      },
+      showStaff(){
+        if (this.currentUser && this.currentUser.roles) {
+          return this.currentUser.roles.includes('ROLE_STAFF')
+        }
+
+        return false;
       },
     },
     methods: {

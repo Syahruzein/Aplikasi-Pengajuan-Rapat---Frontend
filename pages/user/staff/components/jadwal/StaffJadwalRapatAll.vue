@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-card
+        v-if="showStaff"
         class=" pa-6 mt-4"
         outlined
         tile
@@ -110,7 +111,7 @@
                                 <v-btn
                                     class="white--text"
                                     color="bg-gradient-success"
-                                    @click="save"
+                                    @click="save"                                    
                                     >
                                     Done
                                 </v-btn>
@@ -134,7 +135,7 @@
                                 </v-toolbar>
                                 <v-card-text>
                                 <div class="text pa-12">
-                                    <h2 v-if="success">Anda bisa memeriksa di Notulen Rapat, klik dibawah ini :</h2>
+                                    <h2 v-if="success">Anda bisa memeriksa di Notulen rapat, klik dibawah ini :</h2>
                                     <h2 v-if="!success">Anda bisa mencoba lagi, klik dibawah ini :</h2>
                                     </div>
                                 </v-card-text>
@@ -142,7 +143,7 @@
                                 <v-btn
                                     class="white--text"
                                     color="bg-gradient-info"
-                                    @click.stop="dialogUPdate = !dialogUpdate"
+                                    @click.stop="closeDialogUpdate"
                                 >Close</v-btn>
                                 </v-card-actions>
                                 <v-card-actions v-if="success" class="justify-end">
@@ -150,6 +151,7 @@
                                     class="white--text"
                                     color="bg-gradient-info"
                                     @click.stop="dialogUpdate = !dialogUpdate"
+                                    :to="`/user/staff/Notulen`"
                                 >Ok</v-btn>
                                 </v-card-actions>
                             </v-card>
@@ -184,6 +186,17 @@
                             </div>
                      </template>
                 </v-data-table> 
+            </v-card>
+        </v-card>
+        <v-card v-if="!showStaff" class="pa-6 mt-4" outlined tile>
+            <v-card elevation="3" class="pa-8">
+              <v-alert
+                type="error"
+                prominent
+                border="left"
+              >          
+                <h2>Required role staff !!!.</h2>
+              </v-alert>
             </v-card>
         </v-card>
     </div>
@@ -298,6 +311,9 @@
                 this.editedIndex = -1
                 })
             },
+            closeDialogUpdate() {
+                this.dialogUpdate = false
+            },
             save () {
                 const meet_id = this.selectedItemIndex.id;
                 if (this.editedIndex > -1) {
@@ -337,6 +353,13 @@
             },
             currentUser() {
                 return this.$store.state.authentication.user;
+            },
+            showStaff(){
+                if (this.currentUser && this.currentUser.roles) {
+                    return this.currentUser.roles.includes('ROLE_STAFF')
+                }
+
+                return false;
             },
             computedDateFormattedMomentjs () {
                 return this.selectedItemIndex.tanggal ? moment(this.selectedItemIndex.tanggal).format('dddd, MMMM Do YYYY') : ''

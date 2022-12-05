@@ -1,6 +1,7 @@
 <template>
 <div>
     <v-card
+    v-if="showKadep"
     class=" pa-6 mt-4"
     outlined
     tile
@@ -89,14 +90,16 @@
                                             <v-list-item>
                                             <v-list-item-content>
                                                 <v-list-item-title>Tanggal</v-list-item-title>
-                                                <v-menu
+                                                <v-dialog
                                                 ref="menu"
                                                 v-model="menu"
                                                 :close-on-content-click="false"
                                                 :return-value.sync="selectedItemIndex.tanggal"
                                                 transition="scale-transition"
                                                 offset-y
-                                                min-width="auto"
+                                                persistent
+                                                max-width="290px"
+                                                min-width="290px"
                                                 >
                                                 <template v-slot:activator="{ on, attrs }">
                                                     <v-text-field
@@ -113,6 +116,7 @@
                                                     v-model="selectedItemIndex.tanggal"
                                                     no-title
                                                     scrollable
+                                                    @change="triple"
                                                 >
                                                 <v-spacer></v-spacer>
                                                     <v-btn
@@ -125,18 +129,18 @@
                                                     <v-btn
                                                         text
                                                         color="primary"
-                                                        @click="$refs.menu.save(selectedItemIndex.tanggal)"
+                                                        @click="$refs.menu.save(selectedItemIndex.tanggal); alerts = true;"
                                                     >
                                                         OK
                                                     </v-btn>
                                                 </v-date-picker>
-                                                </v-menu>
+                                                </v-dialog>
                                             </v-list-item-content>
                                             </v-list-item>
                                             <v-list-item>
                                             <v-list-item-content>
                                                 <v-list-item-title>Waktu</v-list-item-title>
-                                                <v-menu
+                                                <v-dialog
                                                 ref="menu2"
                                                 v-model="menu2"
                                                 :close-on-content-click="false"
@@ -144,6 +148,7 @@
                                                 :return-value.sync="selectedItemIndex.waktu"
                                                 transition="scale-transition"
                                                 offset-y
+                                                persistent
                                                 max-width="290px"
                                                 min-width="290px"
                                             >
@@ -161,6 +166,7 @@
                                                 v-model="selectedItemIndex.waktu"
                                                 no-title
                                                 scrollable
+                                                @change="timedi"
                                                 >
                                                 <v-spacer></v-spacer>
                                                 <v-btn
@@ -178,9 +184,106 @@
                                                     OK
                                                 </v-btn>
                                                 </v-time-picker>
-                                            </v-menu>
+                                            </v-dialog>
                                             </v-list-item-content>
                                             </v-list-item>
+
+                                            <v-alert
+                                            :value="alerts"
+                                            outlined
+                                            color="cyan"
+                                            border="left"
+                                            type="info"
+                                            transition="scale-transition"
+                                            >
+                                                <v-row>
+
+                                                <v-col
+                                                v-if="(fixDateCheck.length === 0)"
+                                                >
+                                                    <p class="black--text">
+                                                    Belum ada yang mengajukan hari yang dipilih. Anda bisa mengajukan rapat!!.
+                                                    </p>
+                                                    <v-data-table
+                                                    :headers="headers"
+                                                    :items="fixDateCheck"
+                                                    sort-by="waktu"
+                                                    class="elevation-1"
+                                                    >
+                                                    <template v-slot:[getItemTanggal()]="{ item }">
+                                                        <span>{{ new Date(item.tanggal).toLocaleDateString('da') }}</span>
+                                                        <!-- da-DK -->
+                                                    </template>
+                                                    </v-data-table>
+                                                    <p class="red--text pt-6">
+                                                    <i>
+                                                        Catatans : Rapat maksimal dalam 1 hari adalah 3 kali dan Jika ada waktu yang sudah dipesan. Anda tidak akan bisa memilih waktu dengan jangkauan 2 jam sebelumnya dan 2 jam setelahnya !!!. Terima kasih.
+                                                    </i>
+                                                    </p>
+                                                </v-col>
+
+                                                <v-col
+                                                v-if="(fixDateCheck.length >= 3)"
+                                                >
+                                                    <p class="red--text">
+                                                    Hari yang dipilih sudah penuh. Mohon ma'af, tidak bisa mengajukan rapat!!.
+                                                    <br>Berikut detail rapat yang sudah ada :
+                                                    </p>
+                                                    <v-data-table
+                                                    :headers="headers"
+                                                    :items="fixDateCheck"
+                                                    sort-by="waktu"
+                                                    class="elevation-1"
+                                                    >
+                                                    <template v-slot:[getItemTanggal()]="{ item }">
+                                                        <span>{{ new Date(item.tanggal).toLocaleDateString('da') }}</span>
+                                                        <!-- da-DK -->
+                                                    </template>
+                                                    </v-data-table>
+                                                    <p class="red--text pt-6">
+                                                    <i>
+                                                        Catatans : Rapat maksimal dalam 1 hari adalah 3 kali dan Jika ada waktu yang sudah dipesan. Anda tidak akan bisa memilih waktu dengan jangkauan 2 jam sebelumnya dan 2 jam setelahnya !!!. Terima kasih.
+                                                    </i>
+                                                    </p>
+                                                </v-col>
+                                                
+                                                <v-col
+                                                v-if="(fixDateCheck.length >= 1 && fixDateCheck.length < 3)"
+                                                >
+                                                    <p class="black--text">
+                                                    Masih bisa mengajukan hari yang dipilih. Anda bisa mengajukan rapat!!.
+                                                    <br>Berikut detail rapat yang sudah ada :
+                                                    </p>
+                                                    <v-data-table
+                                                    :headers="headers"
+                                                    :items="fixDateCheck"
+                                                    sort-by="waktu"
+                                                    class="elevation-1"
+                                                    >
+                                                    <template v-slot:[getItemTanggal()]="{ item }">
+                                                        <span>{{ new Date(item.tanggal).toLocaleDateString('da') }}</span>
+                                                        <!-- da-DK -->
+                                                    </template>
+                                                    </v-data-table>
+                                                    
+                                                    <p class="red--text pt-6">
+                                                    <i>
+                                                        Catatans : Rapat maksimal dalam 1 hari adalah 3 kali dan Jika ada waktu yang sudah dipesan. Anda tidak akan bisa memilih waktu dengan jangkauan 2 jam sebelumnya dan 2 jam setelahnya !!!. Terima kasih.
+                                                    </i>
+                                                    </p>
+                                                </v-col>
+
+                                                <v-divider vertical></v-divider>
+                                                <v-btn
+                                                color="red"
+                                                icon
+                                                dark
+                                                @click="alerts = false"
+                                                >
+                                                    <v-icon>mdi-close</v-icon>
+                                                </v-btn>
+                                                </v-row>
+                                            </v-alert>
 
                                             <v-list-item>
                                             <v-list-item-content>
@@ -189,8 +292,10 @@
                                                         :disabled="!isEditing"
                                                         v-model="selectedItemIndex.receiver"
                                                         :items="executive"
+                                                        required
                                                         item-text="position"
                                                         item-value="position"
+                                                        @change="except"
                                                     ></v-select>
                                             </v-list-item-content>
                                             </v-list-item>
@@ -206,15 +311,31 @@
                                                 item-text="username"
                                                 item-value="username"
                                                 multiple
+                                                clearable
+                                                single-line
+                                                required
                                                 >
+                                                    <template v-slot:prepend-item>
+                                                        <v-list-item ripple @mousedown.prevent @click="toggle">
+                                                        <v-list-item-action>
+                                                            <v-icon
+                                                            :color="selectedItemIndex.participants.length > 0 ? 'indigo darken-4' : ''"
+                                                            >
+                                                            {{ icon }}
+                                                            </v-icon>
+                                                        </v-list-item-action>
+                                                        <v-list-item-content>
+                                                            <v-list-item-title> Select All </v-list-item-title>
+                                                        </v-list-item-content>
+                                                        </v-list-item>
+                                                        <v-divider class="mt-2"></v-divider>
+                                                    </template>
                                                     <template v-slot:selection="data">
                                                         <v-chip
-                                                        :disabled="!isEditing"
                                                         v-bind="data.attrs"
                                                         :input-value="data.selected"
-                                                        close
+                                                        color="yellow"
                                                         @click="data.select"
-                                                        @click:close="remove(data.item)"
                                                         >
                                                             {{ data.item.username }}
                                                         </v-chip>
@@ -262,6 +383,7 @@
                                     class="white--text"
                                     color="bg-gradient-secondary"
                                     @click="close"
+                                    to="/user/kadep/DataPengajuan"
                                 >
                                     Cancel
                                 </v-btn>
@@ -294,21 +416,34 @@
                                 <v-card-text>
                                 <div class="text pa-12">
                                     <h2 v-if="success">Anda bisa memeriksa di Data Pengajuan, klik dibawah ini :</h2>
-                                    <h2 v-if="!success">Anda bisa mencoba mengupdate lagi, klik dibawah ini :</h2>
+                                    <h2 v-if="!success">
+                                        <v-alert
+                                        dense
+                                        outlined
+                                        type="error"
+                                        transition="scale-transition"
+                                        class="pb-6"
+                                        >
+                                          <h3><strong>Pemberitahuan !!!</strong></h3>
+                                          <br><i>Mohon ma'af. Pengajuan rapat sudah dipesan.</i> 
+                                        </v-alert>
+                                        <br><strong>Anda bisa mencoba mengajukan lagi, klik dibawah ini :</strong>
+                                    </h2>
                                     </div>
                                 </v-card-text>
                                 <v-card-actions v-if="!success" class="justify-end">
                                 <v-btn
                                     class="white--text"
                                     color="bg-gradient-secondary"
-                                    @click.stop="dialogUPdate = !dialogUpdate"
+                                    @click="closeUpdate"
                                 >Close</v-btn>
                                 </v-card-actions>
                                 <v-card-actions v-if="success" class="justify-end">
                                 <v-btn
                                     class="white--text"
                                     color="bg-gradient-info"
-                                    @click.stop="dialogUpdate = !dialogUpdate"
+                                    @click="closeUpdate"
+                                    to="/user/kadep/DataPengajuan"
                                 >Ok</v-btn>
                                 </v-card-actions>
                             </v-card>
@@ -361,6 +496,17 @@
             </v-data-table> 
         </v-card>
     </v-card>
+    <v-card v-if="!showKadep" class="pa-6 mt-4" outlined tile>
+        <v-card elevation="3" class="pa-8">
+        <v-alert
+            type="error"
+            prominent
+            border="left"
+        >          
+            <h2>Required role kadep !!!.</h2>
+        </v-alert>
+        </v-card>
+    </v-card>
 </div>
 </template>
 <script>
@@ -381,6 +527,7 @@ export default {
             isOperationsSuccess: false,
             menu: false,
             menu2: false,
+            alerts: false,
             tanggal: new Date().toISOString(),
             kepala: [
                 // { text: "ID", value: "id" },
@@ -405,6 +552,13 @@ export default {
                     "username" : "",
                 }
             ],
+            headers: [
+                // { text: "ID", value: "id" },
+                { text: "Perihal", value: "perihal" },
+                { text: "Tempat", value: "tempat" },
+                { text: "Tanggal", value: "tanggal" },
+                { text: "Waktu", value: "waktu" },
+            ],
             executive: [
                 {
                     "position": "",
@@ -416,6 +570,39 @@ export default {
                     "username": "laha",
                 }
             ],
+            people2: [{}],
+      
+            dateCheck: [{}],
+
+            fixDateCheck: [{}],
+
+            fixTimeCheck: [{}],
+
+            valid: false,
+
+            perihalRules: [
+            (v) => !!v || "Perihal is required",
+            (v) => (v && v.length <= 30) || "Perihal must be less than 30 characters",
+            (v) => (v && v.length >= 4) || "Perihal must be more than 4 characters",
+            ],
+            tempatRules: [
+            (v) => !!v || "Tempat is required",
+            (v) => (v && v.length >= 4) || "Tempat must be more than 4 characters",
+            ],
+            tanggalRules: [(v) => !!v || "Tanggal is required"],
+            waktuRules: [(v) => !!v || "Waktu is required"],
+            receiverRules: [(v) => !!v || "Penerima is required"],
+            participantsRules: [
+            (v) => !!v || "Peserta is required",
+            (v) => (v && v.length > 0) || "Peserta required",
+            ],
+            deskripsiRules: [
+            (v) => !!v || "Deskripsi is required",
+            (v) =>
+                (v && v.length <= 250) || "Deskripsi must be less than 250 characters",
+            (v) => (v && v.length >= 4) || "Deskripsi must be more than 4 characters",
+            ],
+            checkboxRules: [($v) => !!$v || "You must agree to continue!"],
             defaultItem : {
                 perihal: '',
                 tempat: '',
@@ -432,6 +619,12 @@ export default {
         getColor (status) {
             if (status == '1') return 'blue'
             else return 'red'
+        },
+        async getMeet() {
+            const getData = await this.$axios(
+                `http://localhost:8080/meet/process-and-success`
+            );
+            this.dateCheck = getData.data;
         },
         async countPengajuan() {
             const user_id = this.$store.state.authentication.user.id;
@@ -452,8 +645,51 @@ export default {
             this.executive = getData.data;
         },
         async getParticipants(){
-            const getData = await this.$axios(`http://localhost:8080/api/auth/user`);
+            const username = this.$store.state.authentication.user.username;
+            const getData = await this.$axios(`http://localhost:8080/api/auth/user-invite/${username}`);
             this.people = getData.data;
+            this.people2 = getData.data;
+        },
+        except() {
+            const exception = this.people2.map((item) => {
+                if (item.position != this.selectedItemIndex.receiver) {
+                    return item;
+                }
+            });
+            this.people = exception;
+        },
+        triple() {
+            const triplying = this.dateCheck.filter((item) => {
+                return moment(item.tanggal).isSame(new Date(this.selectedItemIndex.tanggal), "day")
+            })
+            if(triplying.length >= 3) {
+                console.log("error")
+            } else {
+                console.log('betul')
+            }
+            this.fixDateCheck = triplying;
+            console.log(this.fixDateCheck);
+        },
+        timedi() {
+            const timede = this.dateCheck.filter((item) => {
+                return moment(item.tanggal).isSame(new Date(this.selectedItemIndex.tanggal), "day")
+            }).filter((item)=> {
+                var format = 'HH:mm'
+                const time = moment(this.selectedItemIndex.waktu, format);
+                const beforeTime = moment(item.waktu, format).add(-2, 'hours');
+                const afterTime = moment(item.waktu, format).add(2, 'hours');
+                // console.log(time, beforeTime, afterTime)
+                if(time.isBetween(beforeTime, afterTime)) {
+                    console.log('tidak boleh')
+                }
+            })
+            this.fixTimeCheck = timede;
+        },
+        toggle() {
+            this.$nextTick(() => {
+                this.selectedItemIndex.participants = this.people;
+                this.isSelectAll = true;
+            });
         },
         getItemStatus() {
             return "item.status";
@@ -470,6 +706,7 @@ export default {
         editItem(item) {
             this.editedIndex = this.meet.indexOf(item);
             this.selectedItemIndex = Object.assign({}, item);
+            this.except(this.editedIndex);
             this.dialog = true;
         },
         deleteItem() {
@@ -479,12 +716,17 @@ export default {
         close () {
             this.dialog = false
             this.isEditing = false
+            this.alerts = false
             this.$nextTick(() => {
                 this.selectedItemIndex = Object.assign({}, this.defaultItem)
                 // window.$nuxt.refresh()
                 // window.location.reload(true)
             this.editedIndex = -1
             })
+        },
+        closeUpdate () {
+            this.dialogUpdate = false;
+            this.alerts = false;
         },
         closeDelete() {
             this.dialogDelete = false;
@@ -505,11 +747,15 @@ export default {
                 .catch(e => console.log("Gagal Menghapus Data", e));
         },
         save () {
+            let finalParticipants = this.selectedItemIndex.participants;
+            if(this.isSelectAll){
+                finalParticipants = finalParticipants.filter(item=> item != undefined).map((item) => item.username)
+            }
             if (this.editedIndex > -1) {
                     this.$axios({
                     method: 'put',
                     url: 'http://localhost:8080/meet/update-process' ,
-                    data: Object.assign(this.meet[this.editedIndex], this.selectedItemIndex), 
+                    data: Object.assign(this.meet[this.editedIndex], this.selectedItemIndex, this.selectedItemIndex.participants = finalParticipants), 
                     })
                     .then(response => {
                         this.isOperationsSuccess = true
@@ -536,6 +782,7 @@ export default {
         this.countPengajuan();
         this.getPengajuan();
         this.getReceiver();
+        this.getMeet();
         this.getParticipants();
         if (!this.currentUser) {
             this.$router.push('/');
@@ -548,8 +795,26 @@ export default {
         currentUser() {
             return this.$store.state.authentication.user;
         },
+        showKadep() {
+            if (this.currentUser && this.currentUser.roles) {
+                return this.currentUser.roles.includes('ROLE_KADEP')
+            }
+
+            return false;
+        },
         computedDateFormattedMomentjs () {
             return this.selectedItemIndex.tanggal ? moment(this.selectedItemIndex.tanggal).format('DD MMMM YYYY') : ''
+        },
+        likeAllParticipants() {
+            return this.selectedItemIndex.participants.length === this.people.length;
+        },
+        likeSomeParticipants() {
+            return this.selectedItemIndex.participants.length > 0 && !this.likeAllParticipants;
+        },
+        icon() {
+            if (this.likeAllParticipants) return "mdi-close-box";
+            if (this.likeSomeParticipants) return "mdi-minus-box";
+            return "mdi-checkbox-blank-outline";
         },
     }
 }

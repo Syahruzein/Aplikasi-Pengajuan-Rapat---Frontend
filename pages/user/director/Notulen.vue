@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-card
+            v-if="showDirector"
             class=" pa-6 mt-4"
             outlined
             tile
@@ -61,8 +62,8 @@
                                             Ringkasan
                                         </p>
                                         <p>dari Sekretaris</p>
-                                        <div v-if="catatans[0].notulen === ''" class="text--primary " >
-                                            Mohon ma;af
+                                        <div v-if="(catatans[0].notulen === null)" class="text--primary " >
+                                            <i class="red--text">Mohon ma'af notulen belum dibuat</i>
                                         </div>
                                         <div v-else class="text--primary " >
                                             {{ catatans[0].notulen }}
@@ -196,6 +197,17 @@
                 </v-data-table>
             </v-card>
         </v-card>
+        <v-card v-if="!showDirector" class="pa-6 mt-4" outlined tile>
+            <v-card elevation="3" class="pa-8">
+                <v-alert
+                type="error"
+                prominent
+                border="left"
+                >          
+                <h2>Required role director !!!.</h2>
+                </v-alert>
+            </v-card>
+        </v-card>
     </div>
 </template>
 <script>
@@ -323,6 +335,13 @@ export default {
     computed: {
         currentUser() {
             return this.$store.state.authentication.user;
+        },
+        showDirector() {
+            if (this.currentUser && this.currentUser.roles) {
+                return this.currentUser.roles.includes('ROLE_DIRECTOR');
+            }
+
+            return false;
         },
         computedDateFormattedMomentjs () {
             return this.selectedItemIndex.tanggal ? moment(this.selectedItemIndex.tanggal).format('dddd, MMMM Do YYYY') : ''

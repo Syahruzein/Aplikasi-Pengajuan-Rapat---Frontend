@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-card
+        v-if="showKadep"
         class=" pa-6 mt-4"
         outlined
         tile
@@ -141,6 +142,17 @@
                 </v-data-table> 
             </v-card>
         </v-card>
+        <v-card v-if="!showKadep" class="pa-6 mt-4" outlined tile>
+            <v-card elevation="3" class="pa-8">
+            <v-alert
+                type="error"
+                prominent
+                border="left"
+            >          
+                <h2>Required role kadep !!!.</h2>
+            </v-alert>
+            </v-card>
+        </v-card>
     </div>
     </template>
     <script>
@@ -256,6 +268,13 @@
             },
             currentUser() {
                 return this.$store.state.authentication.user;
+            },
+            showKadep() {
+                if (this.currentUser && this.currentUser.roles) {
+                    return this.currentUser.roles.includes('ROLE_KADEP')
+                }
+
+                return false;
             },
             computedDateFormattedMomentjs () {
                 return this.selectedItemIndex.tanggal ? moment(this.selectedItemIndex.tanggal).format('dddd, MMMM Do YYYY') : ''
